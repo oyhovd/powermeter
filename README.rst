@@ -23,6 +23,12 @@ Hardware setup
 Phototransistor e.g. TEPT 5600, between ground and pin P0.01 on a Nordic Semiconductor PCA10028 dev
 kit. Aim the phototransistor at the blinking diode on your utility meter.
 
+TODO
+****
+* Erase flash pages at wraparound (currently the data gets garbled when we try to rewrite already
+  written flash)
+* Dump logged data over Bluetooth
+
 Resources
 *********
 
