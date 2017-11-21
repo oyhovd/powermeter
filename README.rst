@@ -14,6 +14,10 @@ To compile for nRF51 on PCA10028, just run::
 
 You will have to have set up the Zephyr project's SDK, see Resources below.
 
+Disclaimer
+**********
+This is a quick and dirty hobby project. The code quality may reflect that :)
+
 Hardware setup
 **************
 Phototransistor e.g. TEPT 5600, between ground and pin P0.01 on a Nordic Semiconductor PCA10028 dev
