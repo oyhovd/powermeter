@@ -5,7 +5,8 @@ This is a simple utility meter project inspired by GitHub user wulffern's `nrf52
 project, based on the `Zephyr Project RTOS`_, version 1.9.1. It is a modification of the Zephyr
 project's peripheral_hr example, without all the heartrate stuff.
 
-The project will log your power consumption. Features are constantly changing :)
+The project will log your power consumption over time, and advertise the current and recent power
+consumption.  Features are constantly changing :)
 
 To compile for nRF51 on PCA10028, just run::
 
