@@ -41,7 +41,7 @@
 #define M_DEBOUNCE_MS (50)
 #define M_BLINK_TIMEOUT_MS (5*M_DEBOUNCE_MS)
 #define M_INIT_TIME_MS (M_SAMPLE_INTERVAL_MS*M_TAU*4) //4 time constants should get us close
-#define M_SECS_SLOT (60)  //Seconds per slot in the array below. Let it be dividable by 60.
+#define M_SECS_SLOT (60)  //Seconds per slot in the array below. Let it be a factor in 60
 #define M_SECS_HOUR (3600)
 
 #define M_FLASH_FIRST_PAGE (0x20000)

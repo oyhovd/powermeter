@@ -95,6 +95,7 @@ static struct bt_conn_auth_cb auth_cb_display = {
 	.cancel = auth_cancel,
 };
 
+//Restarts advertising, uses the latest power stats in the device name
 void adv_update(void)
 {
 	//Check if it is time
@@ -149,16 +150,21 @@ void main(void)
 
 	pm_init();
 
-	/* Implement notification. At the moment there is no suitable way
-	 * of starting delayed work so we do it here
-	 */
 	u64_t next_up = 0;
 	while (1) {
-		u32_t now = k_uptime_get_32();
-		s32_t time_to_sleep = next_up - now;
-		if(time_to_sleep > 0)
+		//Spin until next iteration
+		while(1)
 		{
-			k_sleep(time_to_sleep);
+			u32_t now = k_uptime_get_32();
+			s32_t time_to_sleep = next_up - now;
+			if(time_to_sleep > 0)
+			{
+				k_sleep(time_to_sleep);
+			}
+			else
+			{
+				break;
+			}
 		}
 		next_up += M_ITERATION_TIME_MS;
 
