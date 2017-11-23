@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 #Generating two smoothed curves as well, each of these are in minutes to smooth over
 smoothingtime1 = 20
 smoothingtime2 = 60
+smoothingtime3 = 60*24
 
 #use
 #  nrfjprog --memrd <address> -n <bytes>
@@ -19,6 +20,7 @@ with open(sys.argv[1], 'r') as memdumpfile:
     values = []
     smoothed_1 = []
     smoothed_2 = []
+    smoothed_3 = []
     timestamps_hr = []
     timestamp_min = 0
     i = 0
@@ -44,10 +46,15 @@ with open(sys.argv[1], 'r') as memdumpfile:
             if start >= 0:
                 smoothed_2.append(sum(values[start:i])/smoothingtime2)
 
+            start = i - smoothingtime3
+            if start >= 0:
+                smoothed_3.append(sum(values[start:i])/smoothingtime3)
+
 
     plt.plot(timestamps_hr, values)
     plt.plot(timestamps_hr[smoothingtime1-1:], smoothed_1)
     plt.plot(timestamps_hr[smoothingtime2-1:], smoothed_2)
+    plt.plot(timestamps_hr[smoothingtime3-1:], smoothed_3)
     plt.ylabel('kW')
     plt.xlabel('Time')
     plt.show()
