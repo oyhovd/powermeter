@@ -1,5 +1,5 @@
-Zephyr Project
-##############
+Powermeter
+##########
 
 This is a simple utility meter project inspired by GitHub user wulffern's `nrf52-utilitymeter`_
 project, based on the `Zephyr Project RTOS`_, version 1.9.1. It is a modification of the Zephyr
