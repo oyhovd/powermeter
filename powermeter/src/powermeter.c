@@ -34,11 +34,18 @@
 //Uncomment to get some faked measurements
 //#define SIMULATE
 //#define FAST
+//#define EXTRA_FAST
 
 #ifdef FAST
-#define FAST_MULTIPLIER (30)
+#define FAST_MULTIPLIER (60)
 #else
 #define FAST_MULTIPLIER (1)
+#endif
+
+#ifdef EXTRA_FAST
+#define EXTRA_FAST_MULTIPLIER (100)
+#else
+#define EXTRA_FAST_MULTIPLIER (1)
 #endif
 
 #define M_SAMPLE_INTERVAL_MS (10) //100Hz
@@ -186,9 +193,9 @@ static u8_t m_sample_get(void)
 static void m_slot_update(void)
 {
     //Write flash if a new slot has started
-    u32_t current_second = (u32_t)(k_uptime_get()/1000);
+    u32_t current_second = (u32_t)(k_uptime_get()/(1000/EXTRA_FAST_MULTIPLIER));
     static u32_t prev_slot = 0;
-    u32_t current_slot = (current_second/M_SECS_SLOT) % (2);
+    u32_t current_slot = (current_second/M_SECS_SLOT) % (M_FLASH_WORDS_RESERVED);
     if(prev_slot != current_slot)
     {
         m_update_flash_store(m_meas);
@@ -232,9 +239,15 @@ static void m_update_flash_store(u32_t data)
 
     if((*m_flash_array)[next_empty_word] != M_EMPTY_FLASH_WORD)
     {
-        //TODO
+        offset = (u32_t)m_flash_page_pointer + next_empty_word*sizeof(u32_t);
         //Find start of page
-        //erase it
+        offset = M_FLASH_PAGE_SIZE * (offset/M_FLASH_PAGE_SIZE);
+
+        flash_write_protection_set(flash_dev, false);
+        if (flash_erase(flash_dev, offset, M_FLASH_PAGE_SIZE) != 0) {
+            while(1);
+        }
+        flash_write_protection_set(flash_dev, true);
     }
 }
 
@@ -249,15 +262,45 @@ void pm_init(void)
     nrf_adc_configure(&config);
 
     //find next word to write
+    bool found_existing = false;
     u32_t i;
     for(i = 0; i < M_FLASH_WORDS_RESERVED; i++)
     {
-        if((*m_flash_array)[i] == M_EMPTY_FLASH_WORD)
+        if((*m_flash_array)[i] != M_EMPTY_FLASH_WORD)
+        {
+            found_existing = true;
+        }
+        if(found_existing && ((*m_flash_array)[i] == M_EMPTY_FLASH_WORD))
         {
             break;
         }
     }
-    m_next_word_to_write = i;
+
+    //If not found anything
+    if(i == M_FLASH_WORDS_RESERVED)
+    {
+        m_next_word_to_write = 0;
+    }
+    else
+    {
+        m_next_word_to_write = i;
+    }
+
+    //erase if needed
+    if((*m_flash_array)[m_next_word_to_write] != M_EMPTY_FLASH_WORD)
+    {
+        u32_t offset = (u32_t)m_flash_page_pointer + m_next_word_to_write*sizeof(u32_t);
+        //Find start of page
+        offset = M_FLASH_PAGE_SIZE * (offset/M_FLASH_PAGE_SIZE);
+
+        struct device *flash_dev;
+        flash_dev = device_get_binding(CONFIG_SOC_FLASH_NRF5_DEV_NAME);
+        flash_write_protection_set(flash_dev, false);
+        if (flash_erase(flash_dev, offset, M_FLASH_PAGE_SIZE) != 0) {
+            while(1);
+        }
+        flash_write_protection_set(flash_dev, true);
+    }
 }
 
 void pm_blink_count_update(void)
